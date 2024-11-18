@@ -18,3 +18,7 @@ source env/bin/activate
 
 # Install the required packages
 pip install -r requirements.txt
+
+
+# Crtanje staza(SVG)
+https://boxy-svg.com/app
