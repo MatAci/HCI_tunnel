@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+    <div class="border p-4 rounded shadow w-100" style="max-width: 400px;">
+      <h2 class="text-center mb-4">Login</h2>
+      <form action="/" method="POST">
+        <div class="mb-3">
+          <label for="username" class="form-label">Ime:</label>
+          <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Prijava</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
