@@ -10,15 +10,17 @@ TASK_PAGES = [
     "track3.html"
 ]
 
-@views.route('/home')
-def home():
-    if 'username' not in session:
-        return redirect(url_for('views.login'))
+@views.route('/track')
+def track():
+    if 'username' not in session or 'selected_device' not in session:
+        return redirect(url_for('views.home'))  # Preusmjeri na home ako uređaj nije odabran
     
-    # Započni od prve stranice
+    # Početak zadataka
     session['current_task_index'] = 0
     username = session['username']
-    return render_template('track1.html', username=username)
+    device = session['selected_device']
+    return render_template('track1.html', username=username, device=device)
+
 
 @views.route('/', methods=['GET', 'POST'])
 def login():
@@ -28,33 +30,51 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         session['username'] = username
+        session['selected_device'] = None  # Resetiraj odabir uređaja pri loginu
         return redirect(url_for('views.home'))
     
     return render_template('login.html')
 
+@views.route('/home', methods=['GET', 'POST'])
+def home():
+    if 'username' not in session:
+        return redirect(url_for('views.login')) 
+    
+    username = session['username']
+
+    if request.method == 'POST':
+        selected_device = request.form.get('device')
+        if selected_device:
+            session['selected_device'] = selected_device
+            return redirect(url_for('views.track'))
+    
+    return render_template('home.html', username=username)
+
 @views.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('selected_device', None)
+    session.pop('current_task_index', None)
     return redirect(url_for('views.login'))
 
 @views.route('/task-completed', methods=['POST'])
 def task_completed():
-
     data = request.get_json()
 
     elapsed_time = data.get('elapsedTime')
     error_count = data.get('errorCount')
-    username = data.get('username')
+    username = session.get('username')
     trackId = data.get('trackId')
+    device = session.get('selected_device')
     
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
 
-    c.execute('''INSERT INTO task_results (time, errors, username, trackid)
-                 VALUES (?, ?, ?, ?)''', (elapsed_time, error_count, username, trackId))
+    c.execute('''INSERT INTO task_results (time, errors, username, trackid, device)
+                 VALUES (?, ?, ?, ?, ?)''', (elapsed_time, error_count, username, trackId, device))
     
-    conn.commit()  
-    conn.close()   
+    conn.commit()
+    conn.close()
 
     time.sleep(3)
 
@@ -66,7 +86,6 @@ def task_completed():
     else:
         return jsonify({"message": "Sve stranice su završene.", "finished": True}), 200
 
-    # Vratite odgovor da frontend zna koju stranicu učitati
     return jsonify({"message": "Podaci su uspješno pohranjeni.", "next_page": next_page}), 200
 
 @views.route('/next-task')
@@ -76,4 +95,5 @@ def next_task():
         return redirect(url_for('views.home'))  # Vraćamo se na početak nakon svih zadataka
 
     username = session['username']
-    return render_template(TASK_PAGES[current_index], username=username)
+    device = session['selected_device']
+    return render_template(TASK_PAGES[current_index], username=username, device=device)

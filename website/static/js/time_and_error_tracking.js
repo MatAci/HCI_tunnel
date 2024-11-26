@@ -10,7 +10,7 @@ document.getElementById("result-container").classList.remove("d-none");
 function startTimer() {
     if (!startTime) {
         startTime = Date.now();
-        timerInterval = setInterval(updateTime, 100);
+        timerInterval = setInterval(updateTime, 10);
     }
 }
   
