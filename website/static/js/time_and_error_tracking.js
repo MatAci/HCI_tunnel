@@ -31,6 +31,7 @@ function resetGame() {
     document.getElementById("result-container").classList.remove("d-none");
 }
 
+
 function taskCompletedSuccessfully() {
     document.getElementById('timeDisplay').textContent = `Vrijeme: ${elapsedTime} sekundi`;
     document.getElementById('errorCountDisplay').textContent = `Broj pogrešaka: ${errorCount}`;
@@ -40,4 +41,42 @@ function taskCompletedSuccessfully() {
   
     const resultContainer = document.getElementById('result-container');
     resultContainer.classList.remove('d-none'); 
-  }
+
+    var username = document.getElementById('hiddenUsername').textContent;
+    var trackId = document.getElementById('hiddenTrackID').textContent;
+
+        const dataToSend = {
+            elapsedTime: elapsedTime,
+            errorCount: errorCount,
+            username: username,
+            trackId: trackId
+        };
+
+        fetch('/task-completed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                elapsedTime: elapsedTime,
+                errorCount: errorCount,
+                username: username,
+                trackId: trackId
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+    
+            if (data.finished) {
+                alert("Sve stranice su završene!");
+                window.location.href = '/home'; // Povratak na početnu
+            } else {
+                window.location.href = `/next-task`; // Redirekcija na sljedeći zadatak
+            }
+        })
+        .catch(error => {
+            console.error('Greška prilikom slanja podataka:', error);
+        });
+    }
+    
