@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Staza za prolazak mišem</h2>
+<p>Pomaknite kursor unutar staze i dođite do cilja</p>
+
+<div id="hiddenUsername" style="display:none;">{{ username }}</div>
+<div id="hiddenTrackID" style="display:none;">Medium3</div>
+
+<!-- Wrapping container -->
+<div class="center-container">
+  <!-- SVG for the maze -->
+  <svg width="1900" height="600" style="border: 1px solid black;">
+    <!-- Start Line -->
+    <path id="startLine" style="fill: none; stroke: rgb(0, 0, 0);" d="M 100 275 L 100 350"></path>
+
+    <!-- Stop Line -->
+    <path id="stopLine" style="fill: none; stroke: rgb(0, 0, 0);" d="M 1775 125 L 1775 200"></path>
+
+    <!-- Upper Line -->
+    <path id="upperLine" style="fill: none; stroke: rgb(0, 0, 0);" 
+          d="M 100 275 H 350 V 475 H 525 V 50 H 950 V 450 H 1250 V 125 H 1775 "></path>
+
+    <!-- Lower Line -->
+    <path id="lowerLine" style="fill: none; stroke: rgb(0, 0, 0);" 
+          d="M 100 350 H 275 V 550 H 600 V 125 H 875 V 525 H 1325 V 200 H 1775 "></path>
+  </svg>
+
+  <!-- Results container -->
+  <div id="result-container" class="container text-center mt-4" >
+    <div id="timeDisplay" class="h4" style="width: 1900px;"></div>
+    <div id="errorCountDisplay" class="h5 mt-2" style="width: 1900px;"></div>
+    <!-- Success message -->
+    <div id="successMessage" class="alert alert-success mt-3 d-none" role="alert" style="width: 1900px;">
+      Uspješno završen zadatak, {{ username }}!
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/mouse_tracking.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/time_and_error_tracking.js') }}"></script>
+{% endblock %}

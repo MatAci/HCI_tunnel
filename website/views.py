@@ -1,14 +1,50 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 import sqlite3, time
+import random
 
 views = Blueprint('views', __name__)
 
 # Lista svih stranica za zadatke
-TASK_PAGES = [
-    "track1.html",
-    "track2.html",
-    "track3.html"
+
+TASK_PAGES_EASY = [
+    "easy3.html",
+    "easy2.html",
+    "easy1.html",
+    
 ]
+
+
+
+TASK_PAGES_MEDIUM = [
+     "medium2.html",
+     "medium1.html",
+     "medium3.html",
+    
+  
+]
+
+TASK_PAGES_HARD = [
+    "hard1.html",
+    "hard2.html",
+    "hard3.html",
+    
+
+]
+
+random.shuffle(TASK_PAGES_EASY)
+random.shuffle(TASK_PAGES_MEDIUM)
+random.shuffle(TASK_PAGES_HARD)
+
+
+TASK_PAGES_GRUPA1 = TASK_PAGES_EASY + TASK_PAGES_MEDIUM + TASK_PAGES_HARD
+TASK_PAGES_GRUPA2 = TASK_PAGES_EASY + TASK_PAGES_HARD + TASK_PAGES_MEDIUM
+TASK_PAGES_GRUPA3 = TASK_PAGES_MEDIUM + TASK_PAGES_EASY + TASK_PAGES_HARD
+TASK_PAGES_GRUPA4 = TASK_PAGES_MEDIUM + TASK_PAGES_HARD + TASK_PAGES_EASY
+TASK_PAGES_GRUPA5 = TASK_PAGES_HARD + TASK_PAGES_EASY + TASK_PAGES_MEDIUM
+TASK_PAGES_GRUPA6 = TASK_PAGES_HARD + TASK_PAGES_MEDIUM + TASK_PAGES_EASY
+
+
+  # Slučajno rasporedi stranice
 
 @views.route('/track')
 def track():
@@ -19,7 +55,7 @@ def track():
     session['current_task_index'] = 0
     username = session['username']
     device = session['selected_device']
-    return render_template('track1.html', username=username, device=device)
+    return render_template(TASK_PAGES_GRUPA2[0], username=username, device=device)
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -80,9 +116,9 @@ def task_completed():
 
     # Postavi indeks za sljedeću stranicu
     current_index = session.get('current_task_index', 0)
-    if current_index < len(TASK_PAGES) - 1:
+    if current_index < len(TASK_PAGES_GRUPA2) - 1:
         session['current_task_index'] = current_index + 1
-        next_page = TASK_PAGES[current_index + 1]
+        next_page = TASK_PAGES_GRUPA2[current_index + 1]
     else:
         return jsonify({"message": "Sve stranice su završene.", "finished": True}), 200
 
@@ -91,9 +127,9 @@ def task_completed():
 @views.route('/next-task')
 def next_task():
     current_index = session.get('current_task_index', 0)
-    if current_index >= len(TASK_PAGES):
+    if current_index >= len(TASK_PAGES_GRUPA2):
         return redirect(url_for('views.home'))  # Vraćamo se na početak nakon svih zadataka
 
     username = session['username']
     device = session['selected_device']
-    return render_template(TASK_PAGES[current_index], username=username, device=device)
+    return render_template(TASK_PAGES_GRUPA2[current_index], username=username, device=device)
